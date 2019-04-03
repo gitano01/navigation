@@ -1,95 +1,142 @@
-
 import React  from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View, TextInput, ToastAndroid} from "react-native";
+import {Image, StyleSheet, Text, TouchableOpacity, View, TextInput, Alert, AsyncStorage} from "react-native";
+
 
 
 export default class Login extends React.Component{
 
     static navigationOptions = {
         header: null,
-        
-            
-
     }
-   
+
     constructor(props){
         super(props);
         this.state ={
 
-            user:"",
-            flag: false
+            usuario:'',
+            session: false,
 
-        } 
 
-      
+
+        }
+
+    }
+
+
+    _saveSessionAsync = async () => {
+
+        const {session} = this.state;
+
+
+        AsyncStorage.setItem('session',JSON.stringify(session));
+
+
+
 
 
     }
 
-    InputCheck = () =>{
-
-        var userIn = "victor";
-        var pattern= /^[a-zA-Z0-9_\@]*$/;
-        const {user} = this.state;
-        const {flag} = this.state;
-        (user == "") ? ToastAndroid.show("El campo usuario no debe estar vacío", ToastAndroid.BOTTOM):
-            pattern.test(user)? (user == userIn ) ? this.navegar(flag) :
-                ToastAndroid.show("El usuario no coincide", ToastAndroid.BOTTOM):ToastAndroid.show("El formato no es el adecuado", ToastAndroid.BOTTOM)
 
 
 
+
+
+
+
+    Login = async () => {
+
+        const {usuario} = this.state;
+
+        var cad="";
+
+        var user= "";
+
+        var privacy =  await AsyncStorage.getItem('privacy');
+
+
+        fetch("http://192.168.13.180:3073/api/v1/usuarios/find_by_user?username=" + usuario.toString() ,{
+
+            headers:{
+                'Accept':'application/json',
+                'Content-Type' : 'application/json'
+            }
+
+
+        })
+            .then(res => res.json())
+            .then(response => {
+
+                cad = JSON.stringify(response.code);
+
+
+
+                if (cad == "404"){
+
+
+                    Alert.alert("No se encuentra el usuario");
+                }else{
+
+                    user = JSON.stringify(response.usuario.username);
+                    Alert.alert("Bienvenido a Isla Natura App " +"\n"+ user );
+
+                    this.setState({session: true});
+                    this.props.navigation.navigate((privacy == 'true' ? 'Menu' : 'Aviso'));
+                    this._saveSessionAsync();
+                }
+
+            })
+            .done();
 
     }
 
-    navegar(band){
-        
-              
-        
-        if (band == false){
-            this.props.navigation.navigate('Aviso') 
-            
-        
-        }else{this.props.navigation.navigate('Menu') }
-        this.setState({flag:true})
-        ToastAndroid.show(band.toString(),ToastAndroid.SHORT)
-    }
 
+    render() {
+        /*  if(this.state({session}) == true){
+              this.props.navigation.navigate('Menu')
 
-  render() {
+          }else{*/
 
-    
 
         return (
 
 
-            <View style={styles.container} >
+            <View style={styles.container}>
+
+
 
 
                 <View style={styles.borde}>
-                    <Image style={styles.image} source={require('../images/icono-app-08.png')}/>
-                    
-                    <TextInput style={styles.inputs} placeholder={"Usuario"} onChangeText={ user => this.setState({user})}/>
+
+
+
+                    <Image style={styles.image}
+                           source={require('../images/icono-app-08.png')}/>
+
+                    <TextInput style={styles.inputs} placeholder={"Usuario"}
+                               onChangeText={usuario => this.setState({usuario})}/>
                     <TouchableOpacity style={styles.buttonContainer}
 
-                                      onPress={this.InputCheck}
+                                      onPress={() =>this.Login()}
                     >
-                        <Text  style={styles.buttonText}>Iniciar sesión</Text>
+                        <Text style={styles.buttonText}>Iniciar sesión</Text>
                     </TouchableOpacity>
 
 
                 </View>
 
-                <TouchableOpacity style={styles.buttonContainer2}
-                                  onPress={() => this.props.navigation.navigate('ScanQR')}
-                >
-                    <Image style={styles.image2} source={require('../images/qrcode.png')}/>
+                <TouchableOpacity style={styles.buttonContainer2}onPress={() => this.props.navigation.navigate('ScanQR')}>
+                    <Image style={styles.image2}
+                           source={require('../images/qrcode.png')}/>
                 </TouchableOpacity>
 
 
             </View>
 
         );
+
+
     }
+    //  }
 }
 
 const styles = StyleSheet.create({
@@ -135,7 +182,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom:15,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
 
     },
 
@@ -166,7 +213,7 @@ const styles = StyleSheet.create({
     image2:{
         width: 78,
         height: 78,
-        
+
 
     },
 
@@ -179,7 +226,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FF6C00',
         borderRadius: 5,
-         },
+    },
 
     buttonContainer2: {
 
@@ -193,6 +240,16 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderColor:"white"
     },
+    buttonContainer3: {
+
+        width:200,
+        height:35,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000000',
+        borderRadius: 5,
+    },
+
     buttonText: {
         textAlign: 'center',
         color: "#FFF",
@@ -201,4 +258,3 @@ const styles = StyleSheet.create({
 
 
 });
-

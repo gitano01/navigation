@@ -11,7 +11,7 @@ export default class App extends React.Component{
 
             currentScreen: 'Splash'};
 
-        setTimeout( ()=>{this.setState({currentScreen: 'Login'})},500)
+        setTimeout( ()=>{this.setState({currentScreen: 'Login'})},2000)
         }
 
 

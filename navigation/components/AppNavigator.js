@@ -1,32 +1,39 @@
 import React from 'react';
 import {createStackNavigator, createAppContainer, createSwitchNavigator} from 'react-navigation';
-import AuthLoadingScreen from './AuthLoadingScreen';
 import Login from './Login';
 import ScanQR from "./ScanQR";
 import Menu from "./Menu";
 import AvisoP from "./AvisoP";
+import AuthLoadingScreen from './AuthLoadingScreen';
+
+
+
 
 
 const AppStack = createStackNavigator({
+
+
         
-    
-    Aviso:{screen: AvisoP},
-    Menu: {screen: Menu},
-     },
-    /*{
-        initialRouteName: 'Login'
-    },*/
+
+    Menu: {screen: Menu}
+
+
+     }
     );
 
-const AuthStack = createStackNavigator({Login: {screen: Login}, ScanQR:{screen: ScanQR}});
+const AuthStack = createStackNavigator({Login: {screen: Login}, Aviso:{screen: AvisoP},ScanQR: {screen: ScanQR},});
 
 
-const Navigator = createAppContainer(createSwitchNavigator({
+const Navigator = createAppContainer(createSwitchNavigator(
+    {
 
-    AuthLoadingScreen: {screen: AuthLoadingScreen},
-    AuthStack: {screen: AuthStack}, 
-    AppStack: {screen: AppStack},
-    }    
+        AuthLoading: {screen: AuthLoadingScreen},
+        AuthStack: {screen: AuthStack},
+        AppStack: {screen: AppStack}
+    },
+    {
+    initialRouteName: 'AuthLoading',
+    }
 ));
 
 export default Navigator;

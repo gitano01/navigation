@@ -1,11 +1,22 @@
 import React from "react";
-import {ScrollView, Text, StyleSheet, View, TouchableOpacity, Alert, CheckBox} from "react-native";
-
+import {
+    ScrollView,
+    Text,
+    StyleSheet,
+    View,
+    TouchableOpacity,
+    Alert,
+    CheckBox,
+    AsyncStorage,
+    BackHandler
+} from "react-native";
+import ScanQR from './ScanQR';
 
 
 export default class AvisoP extends React.Component{
 
     static navigationOptions ={  title:'Aviso de privacidad',
+        headerLeft: null,
     headerStyle: {
         backgroundColor: '#FF6C00',
       },
@@ -16,8 +27,19 @@ export default class AvisoP extends React.Component{
         super();
         this.state={
             check:false,
-            disabled:true
+            disabled:true,
+            session: false
+
         }
+    }
+    componentDidMount(){
+        BackHandler.addEventListener('hardwareBackPress',()=>{
+
+
+            this._LogOut();
+
+
+        });
     }
 
 
@@ -30,6 +52,35 @@ export default class AvisoP extends React.Component{
         this.setState({disabled:!this.state.disabled})
 
     }
+
+
+    _savePrivacy = async() => {
+
+
+
+        const {check} = this.state;
+
+        await AsyncStorage.setItem('privacy', JSON.stringify(check));
+
+        Alert.alert('successfull');
+
+        this.props.navigation.navigate('Menu')
+
+
+
+    }
+
+    _LogOut = async () => {
+
+        const {session} = this.state;
+
+        await AsyncStorage.setItem('session', JSON.stringify(session));
+
+        this.props.navigation.navigate('Login');
+
+
+    }
+
 
 
     render(){
@@ -53,7 +104,7 @@ export default class AvisoP extends React.Component{
                         Dignissim sodales ut eu sem integer.
 
                     Sodales ut etiam sit amet.{'\n'}</Text>
-
+                    <Text>{}</Text>
                     <View style={{flexDirection:'row'}}>
                     <CheckBox style={styles.checkBox} value={this.state.check} onChange={()=> this.checkBoxTest()}/>
                         <Text onPress={()=> this.checkBoxTest()}>Aceptar terminos y condiciones</Text>
@@ -62,13 +113,12 @@ export default class AvisoP extends React.Component{
                 <View style={styles.contenedor2}>
 
                 <TouchableOpacity style={styles.buttonContainer2}
-                                      onPress={ () =>{ this.props.navigation.navigate('AuthStack')}}
+                                      onPress={ () =>{ this._LogOut()}}
                     >
                         <Text style={styles.buttonText}>Cancelar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.buttonContainer3}
-                                  onPress={ () =>{this.props.navigation.navigate('Menu')}}
+                <TouchableOpacity style={styles.buttonContainer3} onPress={ () =>{this._savePrivacy()}}
                 disabled={this.state.disabled}>
                     <Text style={styles.buttonText}>Siguiente</Text>
                 </TouchableOpacity>
